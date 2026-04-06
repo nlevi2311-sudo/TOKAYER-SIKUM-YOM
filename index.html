@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a73e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="טוקאייר">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>סיכום משמרת טוקאייר</title>
+<style>
+  :root {
+    --blue: #1a73e8;
+    --blue-light: #e8f0fe;
+    --green: #34a853;
+    --green-light: #e6f4ea;
+    --orange: #D85A30;
+    --purple: #534AB7;
+    --yellow: #BA7517;
+    --red: #A32D2D;
+    --teal: #185FA5;
+    --green-h: #3B6D11;
+    --gray: #5f6368;
+    --border: #dadce0;
+    --bg: #f8f9fa;
+    --white: #ffffff;
+    --text: #202124;
+    --warn-bg: #fef7e0;
+    --warn-text: #b06000;
+    --danger-bg: #fce8e6;
+    --danger-text: #c5221f;
+    --success-bg: #e6f4ea;
+    --success-text: #137333;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    direction: rtl;
+    min-height: 100vh;
+  }
+  .topbar {
+    background: var(--blue);
+    color: white;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .topbar-title { font-size: 18px; font-weight: 600; }
+  .topbar-sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .install-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    display: none;
+  }
+  .content { padding: 12px 16px 100px; max-width: 600px; margin: 0 auto; }
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  .field { margin-bottom: 12px; }
+  .field label { font-size: 13px; color: var(--gray); display: block; margin-bottom: 4px; }
+  .field input[type=text],
+  .field input[type=number],
+  .field textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    direction: rtl;
+    color: var(--text);
+    background: var(--white);
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .present-row { display: flex; align-items: center; gap: 8px; }
+  .present-row input { width: 70px; text-align: center; }
+  .present-row span { font-size: 14px; color: var(--gray); }
+  .summary-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .metric {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .metric-val { font-size: 24px; font-weight: 600; color: var(--text); }
+  .metric-lbl { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .houses-header {
+    display: grid;
+    grid-template-columns: 72px 52px 52px 52px 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .houses-header span { font-size: 11px; color: var(--gray); }
+  .house-row {
+    display: grid;
+    grid-template-columns: 72px 52px 52px 52px 1fr;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .house-name { font-size: 14px; font-weight: 600; }
+  .cap-badge {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+    padding: 6px 4px;
+  }
+  .house-row input[type=number] {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 4px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  .house-row input[type=number]:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+  .absent-badge {
+    border-radius: 6px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 4px;
+  }
+  .ab-ok { background: var(--success-bg); color: var(--success-text); }
+  .ab-warn { background: var(--warn-bg); color: var(--warn-text); }
+  .ab-danger { background: var(--danger-bg); color: var(--danger-text); }
+  .house-row input[type=text] {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    width: 100%;
+    direction: rtl;
+  }
+  .list-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .list-item input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    direction: rtl;
+    color: var(--text);
+  }
+  .list-item input:focus { outline: none; border-color: var(--blue); }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--danger-text);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+  }
+  .add-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sheets-steps { margin-bottom: 12px; }
+  .step { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+  .step-num {
+    background: var(--blue-light);
+    color: var(--blue);
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .step-text { font-size: 13px; line-height: 1.5; }
+  .step-text a { color: var(--blue); }
+  .url-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    direction: ltr;
+    color: var(--text);
+    margin-top: 8px;
+  }
+  .url-input:focus { outline: none; border-color: var(--blue); }
+  .status-msg {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  .s-ok { background: var(--success-bg); color: var(--success-text); }
+  .s-err { background: var(--danger-bg); color: var(--danger-text); }
+  .s-info { background: var(--blue-light); color: var(--blue); }
+  .edit-banner {
+    background: var(--warn-bg);
+    border: 1px solid #f9ab00;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--warn-text);
+  }
+  .cancel-edit-btn {
+    background: none;
+    border: none;
+    color: var(--warn-text);
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    right: 0; left: 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+    z-index: 100;
+  }
+  .btn {
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    font-family: inherit;
+  }
+  .btn-wa {
+    background: #25D366;
+    color: white;
+  }
+  .btn-sheets {
+    background: var(--blue);
+    color: white;
+  }
+  .btn-edit {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+    border: 1px solid #f9ab00;
+  }
+  .btn-submit-edit {
+    background: var(--green);
+    color: white;
+  }
+  .extra-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 16px 10px;
+    max-width: 600px;
+    margin: 0 auto;
+    position: fixed;
+    bottom: 68px;
+    right: 0; left: 0;
+    z-index: 99;
+  }
+  .output-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .output-title { font-size: 14px; font-weight: 600; }
+  .copy-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .output-text {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    direction: rtl;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .hn-orange { color: var(--orange); }
+  .hn-purple { color: var(--purple); }
+  .hn-yellow { color: var(--yellow); }
+  .hn-blue { color: var(--teal); }
+  .hn-red { color: var(--red); }
+  .hn-green { color: var(--green-h); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">טוקאייר - סיכום משמרת</div>
+    <div class="topbar-sub" id="todayDate"></div>
+  </div>
+  <button class="install-btn" id="installBtn">התקן אפליקציה</button>
+</div>
+
+<div class="content">
+
+  <div id="editBanner" class="edit-banner" style="display:none">
+    <span>מצב עריכה - תיקון סיכום קיים</span>
+    <button class="cancel-edit-btn" onclick="cancelEdit()">ביטול</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">פרטי משמרת</div>
+    <div class="row2">
+      <div class="field">
+        <label>מנהל תורן</label>
+        <input type="text" id="manahal" placeholder="שמך" />
+      </div>
+      <div class="field">
+        <label>תאריך</label>
+        <input type="text" id="tarich" placeholder="01.04.26" />
+      </div>
+    </div>
+    <div id="editFields" style="display:none">
+      <div class="row2">
+        <div class="field">
+          <label>עורך התיקון</label>
+          <input type="text" id="editorName" placeholder="שמך" />
+        </div>
+        <div class="field">
+          <label>סיבת התיקון</label>
+          <input type="text" id="editReason" placeholder="מה תוקן?" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">תמונת מצב</div>
+    <div class="field">
+      <label>תיאור כללי</label>
+      <input type="text" id="tmuna" placeholder="הפנימייה נקייה, שקטה ורגועה..." />
+    </div>
+    <div class="field">
+      <label>נוכחים</label>
+      <div class="present-row">
+        <input type="number" id="totalNochhim" placeholder="0" readonly style="background:#f8f9fa;font-weight:600;" />
+        <span>מתוך 69</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">חלוקה לפי בתים</div>
+    <div class="summary-bar">
+      <div class="metric"><div class="metric-val" id="sumPresent">0</div><div class="metric-lbl">נוכחים</div></div>
+      <div class="metric"><div class="metric-val" id="sumAbsent">0</div><div class="metric-lbl">חסרים</div></div>
+      <div class="metric"><div class="metric-val">69</div><div class="metric-lbl">מצבת קבועה</div></div>
+    </div>
+    <div class="houses-header">
+      <span>בית</span><span>מצבת</span><span>נוכחים</span><span>חסרים</span><span>שמות חסרים</span>
+    </div>
+    <div id="housesContainer">
+      <div class="house-row" data-house="כתום" data-cap="12">
+        <span class="house-name hn-orange">כתום</span>
+        <span class="cap-badge">12</span>
+        <input type="number" class="present-in" min="0" max="12" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+      <div class="house-row" data-house="סגול" data-cap="11">
+        <span class="house-name hn-purple">סגול</span>
+        <span class="cap-badge">11</span>
+        <input type="number" class="present-in" min="0" max="11" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+      <div class="house-row" data-house="צהוב" data-cap="12">
+        <span class="house-name hn-yellow">צהוב</span>
+        <span class="cap-badge">12</span>
+        <input type="number" class="present-in" min="0" max="12" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+      <div class="house-row" data-house="כחול" data-cap="12">
+        <span class="house-name hn-blue">כחול</span>
+        <span class="cap-badge">12</span>
+        <input type="number" class="present-in" min="0" max="12" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+      <div class="house-row" data-house="אדום" data-cap="10">
+        <span class="house-name hn-red">אדום</span>
+        <span class="cap-badge">10</span>
+        <input type="number" class="present-in" min="0" max="10" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+      <div class="house-row" data-house="ירוק" data-cap="12">
+        <span class="house-name hn-green">ירוק</span>
+        <span class="cap-badge">12</span>
+        <input type="number" class="present-in" min="0" max="12" placeholder="0" oninput="recalc(this)" />
+        <span class="absent-badge ab-ok">0</span>
+        <input type="text" class="absent-names" placeholder="שמות..." />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">אירועים חריגים</div>
+    <div id="eventsList">
+      <div class="list-item"><input type="text" placeholder="תאר אירוע..." class="event-in" /></div>
+    </div>
+    <button class="add-btn" onclick="addItem('eventsList','event-in','תאר אירוע...')">+ הוסף אירוע</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">אירועים רפואיים</div>
+    <div id="medList">
+      <div class="list-item"><input type="text" placeholder="תאר אירוע רפואי..." class="med-in" /></div>
+    </div>
+    <button class="add-btn" onclick="addItem('medList','med-in','תאר אירוע רפואי...')">+ הוסף</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">חניכים שנשארים</div>
+    <div id="stayList">
+      <div class="list-item"><input type="text" placeholder="שם ופרטי האיסוף..." class="stay-in" /></div>
+    </div>
+    <button class="add-btn" onclick="addItem('stayList','stay-in','שם ופרטי האיסוף...')">+ הוסף</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">תחזוקה ונראות</div>
+    <div id="maintList">
+      <div class="list-item"><input type="text" placeholder="תיאור תקלה..." class="maint-in" /></div>
+    </div>
+    <button class="add-btn" onclick="addItem('maintList','maint-in','תיאור תקלה...')">+ הוסף</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">העברת מקל לבוקר</div>
+    <div class="field">
+      <textarea id="makel" placeholder="משימות והנחיות למשמרת הבאה..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">חיבור לגוגל שיטס</div>
+    <div class="sheets-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">פתח <a href="https://script.google.com" target="_blank">script.google.com</a></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">הדבק את קוד Apps Script ופרס כ-Web App</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">הדבק את ה-URL כאן ולחץ שמור</div></div>
+    </div>
+    <input type="text" class="url-input" id="sheetsUrl" placeholder="https://script.google.com/macros/s/.../exec" />
+    <button class="add-btn" style="margin-top:8px;" onclick="saveUrl()">שמור URL</button>
+    <div id="sheetsStatus"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:4px;">
+    <div class="card-title">תיקון סיכום קיים</div>
+    <button class="btn btn-edit" style="width:100%;" onclick="enterEditMode()">כניסה למצב עריכה</button>
+  </div>
+
+  <div class="output-card" id="outputCard">
+    <div class="output-header">
+      <span class="output-title">סיכום מוכן</span>
+      <button class="copy-btn" onclick="copyOutput()">העתק</button>
+    </div>
+    <div class="output-text" id="outputText"></div>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <button class="btn btn-wa" onclick="generateWA()">סיכום ווטסאפ</button>
+  <button class="btn btn-sheets" onclick="saveToSheets()">שמור בשיטס</button>
+</div>
+
+<script>
+let isEdit = false;
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display = 'block';
+});
+
+document.getElementById('installBtn').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') document.getElementById('installBtn').style.display = 'none';
+  deferredPrompt = null;
+};
+
+const today = new Date();
+document.getElementById('todayDate').textContent = today.toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long' });
+document.getElementById('tarich').value = today.toLocaleDateString('he-IL').replace(/\//g,'.');
+
+const savedUrl = localStorage.getItem('tokayer_sheets_url');
+if (savedUrl) document.getElementById('sheetsUrl').value = savedUrl;
+
+function saveUrl() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (url) { localStorage.setItem('tokayer_sheets_url', url); showStatus('URL נשמר!', 'ok'); }
+}
+
+function recalc(input) {
+  const row = input.closest('.house-row');
+  const cap = parseInt(row.dataset.cap);
+  const p = parseInt(input.value) || 0;
+  const a = Math.max(0, cap - p);
+  const badge = row.querySelector('.absent-badge');
+  badge.textContent = a;
+  badge.className = 'absent-badge ' + (a === 0 ? 'ab-ok' : a <= 2 ? 'ab-warn' : 'ab-danger');
+  updateTotals();
+}
+
+function updateTotals() {
+  let tp = 0, ta = 0;
+  document.querySelectorAll('.house-row').forEach(row => {
+    const cap = parseInt(row.dataset.cap);
+    const p = parseInt(row.querySelector('.present-in').value) || 0;
+    tp += p; ta += Math.max(0, cap - p);
+  });
+  document.getElementById('sumPresent').textContent = tp;
+  document.getElementById('sumAbsent').textContent = ta;
+  document.getElementById('totalNochhim').value = tp;
+}
+
+function addItem(listId, cls, ph) {
+  const d = document.createElement('div');
+  d.className = 'list-item';
+  d.innerHTML = `<input type="text" placeholder="${ph}" class="${cls}" /><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  document.getElementById(listId).appendChild(d);
+}
+
+function getList(cls) {
+  return [...document.querySelectorAll('.' + cls)].map(i => i.value.trim()).filter(Boolean);
+}
+
+function collectData() {
+  const houses = {};
+  document.querySelectorAll('.house-row').forEach(row => {
+    const name = row.dataset.house;
+    const cap = parseInt(row.dataset.cap);
+    const p = parseInt(row.querySelector('.present-in').value) || 0;
+    houses[name] = { cap, present: p, absent: Math.max(0, cap - p), names: row.querySelector('.absent-names').value.trim() };
+  });
+  return {
+    tarich: document.getElementById('tarich').value.trim(),
+    manahal: document.getElementById('manahal').value.trim(),
+    tmuna: document.getElementById('tmuna').value.trim(),
+    nochhim: document.getElementById('sumPresent').textContent,
+    sach: '69',
+    houses,
+    events: getList('event-in'),
+    medical: getList('med-in'),
+    staying: getList('stay-in'),
+    maintenance: getList('maint-in'),
+    makel: document.getElementById('makel').value.trim()
+  };
+}
+
+function buildMsg(d) {
+  const editor = document.getElementById('editorName').value.trim();
+  const reason = document.getElementById('editReason').value.trim();
+  let msg = '';
+  if (isEdit) msg += `*תיקון סיכום* | עורך: ${editor} | סיבה: ${reason}\n\n`;
+  msg += `*סיכום יום טוקאייר ${d.tarich}*\n_מנהל תורן: ${d.manahal}_\n\n`;
+  msg += `*תמונת מצב*\n`;
+  if (d.tmuna) msg += `${d.tmuna}\n`;
+  msg += `${d.nochhim} חניכים מתוך ${d.sach}\n\n`;
+  const order = ['כתום','סגול','צהוב','כחול','אדום','ירוק'];
+  let ht = '';
+  order.forEach(n => {
+    const h = d.houses[n];
+    if (!h || (h.present === 0 && h.absent === 0)) return;
+    ht += `${n} - ${h.present} נוכחים`;
+    if (h.absent > 0) { ht += `, ${h.absent} לא נמצאים`; if (h.names) ht += `\nחסרים: ${h.names}`; }
+    ht += '\n';
+  });
+  if (ht) msg += `*חלוקה לפי בתים*\n${ht}\n`;
+  if (d.events.length) { msg += `*אירועים חריגים*\n`; d.events.forEach(e => msg += `• ${e}\n`); msg += '\n'; }
+  if (d.medical.length) { msg += `*אירועים רפואיים*\n`; d.medical.forEach(e => msg += `• ${e}\n`); msg += '\n'; }
+  if (d.staying.length) { msg += `*חניכים שנשארים*\n`; d.staying.forEach(e => msg += `• ${e}\n`); msg += '\n'; }
+  if (d.maintenance.length) { msg += `*תחזוקה ונראות*\n`; d.maintenance.forEach(e => msg += `• ${e}\n`); msg += '\n'; }
+  if (d.makel) msg += `*העברת מקל*\n${d.makel}\n`;
+  return msg;
+}
+
+function generateWA() {
+  const d = collectData();
+  const msg = buildMsg(d);
+  document.getElementById('outputText').textContent = msg;
+  document.getElementById('outputCard').style.display = 'block';
+  document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'הועתק!';
+    setTimeout(() => btn.textContent = 'העתק', 2000);
+  });
+}
+
+function buildRow(d, type) {
+  const editor = document.getElementById('editorName').value.trim();
+  const reason = document.getElementById('editReason').value.trim();
+  const order = ['כתום','סגול','צהוב','כחול','אדום','ירוק'];
+  return [
+    d.tarich, d.manahal, type, editor, reason, d.tmuna, d.nochhim, d.sach,
+    ...order.flatMap(n => [d.houses[n]?.present||0, d.houses[n]?.absent||0, d.houses[n]?.names||'']),
+    d.events.join(' | '), d.medical.join(' | '), d.staying.join(' | '), d.maintenance.join(' | '), d.makel,
+    new Date().toLocaleString('he-IL')
+  ];
+}
+
+async function saveToSheets() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (!url) { showStatus('הכנס Web App URL תחילה', 'err'); return; }
+  showStatus('שולח...', 'info');
+  const d = collectData();
+  const type = isEdit ? 'תיקון' : 'מקורי';
+  if (isEdit) {
+    const editor = document.getElementById('editorName').value.trim();
+    const reason = document.getElementById('editReason').value.trim();
+    if (!editor || !reason) { showStatus('נא למלא עורך וסיבת תיקון', 'err'); return; }
+  }
+  try {
+    await fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ row: buildRow(d, type) }) });
+    showStatus('נשמר בגוגל שיטס!', 'ok');
+    if (isEdit) cancelEdit();
+  } catch(e) {
+    showStatus('שגיאה. בדוק את ה-URL.', 'err');
+  }
+}
+
+function showStatus(msg, type) {
+  document.getElementById('sheetsStatus').innerHTML = `<div class="status-msg s-${type}">${msg}</div>`;
+}
+
+function enterEditMode() {
+  isEdit = true;
+  document.getElementById('editBanner').style.display = 'flex';
+  document.getElementById('editFields').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  isEdit = false;
+  document.getElementById('editBanner').style.display = 'none';
+  document.getElementById('editFields').style.display = 'none';
+  document.getElementById('editorName').value = '';
+  document.getElementById('editReason').value = '';
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>
