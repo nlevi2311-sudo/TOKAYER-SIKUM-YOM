@@ -1,0 +1,170 @@
+// מבנה הנתונים של מערכת הבקרה למנהל תורן.
+// כרגע SQLite מקומי. למעבר ל-Supabase (Postgres) משנים provider ל-"postgresql"
+// ואת DATABASE_URL למחרוזת החיבור של Supabase.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ADMIN = מנהל מערכת, DIRECTOR = מנהל הכפר, DUTY = מנהל תורן
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  fullName     String
+  role         String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions         Session[]
+  shifts           Shift[]
+  checkEntries     CheckEntry[]
+  openedExceptions Exception[]       @relation("openedBy")
+  closedExceptions Exception[]       @relation("closedBy")
+  exceptionUpdates ExceptionUpdate[]
+  auditLogs        AuditLog[]
+}
+
+model Session {
+  id           String   @id
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+}
+
+model Unit {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  sortOrder Int    @default(0)
+  children Child[]
+}
+
+model Child {
+  id              String   @id @default(cuid())
+  fullName        String
+  unitId          String
+  unit            Unit     @relation(fields: [unitId], references: [id])
+  age             Int
+  present         Boolean  @default(true)
+  importantNotes  String   @default("")
+  hasMedication   Boolean  @default(false)
+  medicationNotes String   @default("")
+  bedtime         String   @default("21:30")
+  familyContact   Boolean  @default(true)
+  extraInfo       String   @default("")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  checkEntries CheckEntry[]
+  exceptions   Exception[]
+}
+
+// MORNING, NOON, EVENING, NIGHT, WEEKEND
+model Shift {
+  id           String    @id @default(cuid())
+  managerId    String
+  manager      User      @relation(fields: [managerId], references: [id])
+  date         String // YYYY-MM-DD לפי שעון ישראל
+  type         String
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  status       String    @default("OPEN") // OPEN / CLOSED
+  handoffNotes String    @default("")
+  nextTasks    String    @default("")
+  summaryJson  String    @default("")
+
+  checkEntries     CheckEntry[]
+  exceptions       Exception[]
+  exceptionUpdates ExceptionUpdate[]
+
+  @@index([date])
+}
+
+// בדיקה אחת של תחום אחד לילד אחד ביום אחד
+model CheckEntry {
+  id           String   @id @default(cuid())
+  date         String
+  childId      String
+  child        Child    @relation(fields: [childId], references: [id])
+  itemKey      String
+  status       String // DONE / NOT_DONE / NA / NEEDS_CARE
+  independence String? // INDEPENDENT / REMINDER / ASSISTED / NONE
+  note         String   @default("")
+  shiftId      String
+  shift        Shift    @relation(fields: [shiftId], references: [id])
+  updatedById  String
+  updatedBy    User     @relation(fields: [updatedById], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([date, childId, itemKey])
+  @@index([childId])
+}
+
+// חריגה: נפתחת כשסומן "לא בוצע" או "דורש טיפול", או ידנית כאירוע חריג
+model Exception {
+  id             String    @id @default(cuid())
+  childId        String
+  child          Child     @relation(fields: [childId], references: [id])
+  date           String
+  itemKey        String // מפתח התחום, או INCIDENT לאירוע חריג כללי
+  shiftId        String
+  shift          Shift     @relation(fields: [shiftId], references: [id])
+  openedById     String
+  openedBy       User      @relation("openedBy", fields: [openedById], references: [id])
+  openedAt       DateTime  @default(now())
+  whatHappened   String
+  reason         String
+  actionsTaken   String
+  handler        String
+  needsFollowup  Boolean   @default(false)
+  recheckAt      DateTime?
+  notifyDirector Boolean   @default(false)
+  notifyOther    String    @default("")
+  status         String    @default("OPEN") // OPEN / FOLLOWUP / CLOSED
+  closedById     String?
+  closedBy       User?     @relation("closedBy", fields: [closedById], references: [id])
+  closedAt       DateTime?
+  closureNote    String    @default("")
+  updatedAt      DateTime  @updatedAt
+
+  updates ExceptionUpdate[]
+
+  @@index([status])
+  @@index([childId])
+}
+
+model ExceptionUpdate {
+  id          String    @id @default(cuid())
+  exceptionId String
+  exception   Exception @relation(fields: [exceptionId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  shiftId     String?
+  shift       Shift?    @relation(fields: [shiftId], references: [id])
+  text        String
+  createdAt   DateTime  @default(now())
+}
+
+// יומן פעולות: כל שינוי במערכת נרשם כאן
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String   @default("")
+  details   String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
