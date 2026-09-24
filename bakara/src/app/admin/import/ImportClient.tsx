@@ -31,7 +31,8 @@ export default function ImportClient({ disabled, isDemo, childCount }: { disable
         .map((s) => {
           const headerRow = findHeaderRow(s.data);
           const headers = (s.data[headerRow] ?? []).map((c) => String(c ?? "").trim());
-          return { ...s, headerRow, mapping: autoMap(headers), use: true };
+          const mapping = autoMap(headers);
+          return { ...s, headerRow, mapping, use: parseSheet(s.name, s.data, headerRow, mapping).length > 0 };
         });
       if (!list.length) setFileError("לא נמצאו נתונים בקובץ");
       setSheets(list);

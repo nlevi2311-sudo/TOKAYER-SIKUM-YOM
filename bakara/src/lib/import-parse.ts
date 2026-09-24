@@ -39,10 +39,16 @@ export function findHeaderRow(data: Cell[][]): number {
   return 0;
 }
 
+/** עמודות שלא ממפים אוטומטית: ספירות ומספור */
+const SKIP = /סה"?כ|מסד|מספר|^מס['׳]?\s|#/;
+
 export function autoMap(headers: string[]): Mapping {
   const m: Mapping = {};
   headers.forEach((h, i) => {
+    if (SKIP.test(h)) return;
     for (const [f, re] of PATTERNS) {
+      // הערות לא נלקחות אוטומטית: הן עלולות להכיל מידע רגיש. אפשר לבחור ידנית.
+      if (f === "notes") continue;
       if (m[f] === undefined && re.test(h)) {
         m[f] = i;
         return;
@@ -104,11 +110,19 @@ export type ParsedRow = { fullName: string; unit: string; age: number; hasMedica
 export function parseSheet(sheetName: string, data: Cell[][], headerRow: number, m: Mapping): ParsedRow[] {
   const out: ParsedRow[] = [];
   const get = (row: Cell[], i: number | undefined) => (i === undefined || i < 0 ? null : row[i]);
+  let lastUnit = "";
   for (const row of data.slice(headerRow + 1)) {
     let name = str(get(row, m.fullName));
-    if (!name) name = [str(get(row, m.firstName)), str(get(row, m.lastName))].filter(Boolean).join(" ");
+    if (!name) {
+      // בלי שם פרטי זו לא שורה של ילד (למשל מקום פנוי)
+      if (m.firstName !== undefined && !str(get(row, m.firstName))) continue;
+      name = [str(get(row, m.firstName)), str(get(row, m.lastName))].filter(Boolean).join(" ");
+    }
     if (!name || /^סה"?כ|^total/i.test(name) || /^\d+$/.test(name)) continue;
-    const unit = m.unit === -1 || m.unit === undefined ? sheetName.trim() : str(get(row, m.unit));
+    // ביתן ריק: לוקחים מהשורה הקודמת (רשימות ממוינות לפי ביתן)
+    let unit = m.unit === -1 || m.unit === undefined ? sheetName.trim() : str(get(row, m.unit));
+    if (!unit && m.unit !== undefined && m.unit >= 0) unit = lastUnit;
+    lastUnit = unit;
     const age = m.age !== undefined ? toAge(get(row, m.age)) : m.birth !== undefined ? birthToAge(get(row, m.birth)) : 0;
     out.push({
       fullName: name.replace(/\s+/g, " "),
