@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "setup": "prisma db push --skip-generate && prisma generate && npm run seed",
+    "setup": "prisma db push && npm run seed",
     "seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:if-empty": "tsx prisma/seed-if-empty.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

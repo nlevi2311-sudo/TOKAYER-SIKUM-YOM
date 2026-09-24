@@ -4,9 +4,9 @@ import LoginForm from "./LoginForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ idle?: string }> }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ idle?: string; reset?: string }> }) {
   if (await getCurrentUser()) redirect("/");
-  const { idle } = await searchParams;
+  const { idle, reset } = await searchParams;
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="card w-full max-w-sm space-y-5 p-6">
@@ -18,6 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         {idle ? (
           <div className="rounded-xl bg-warn-bg p-3 text-sm font-semibold text-warn">בוצעה יציאה אוטומטית בגלל חוסר פעילות</div>
         ) : null}
+        {reset ? <div className="rounded-xl bg-ok-bg p-3 text-sm font-semibold text-ok">נתוני הדמה נטענו מחדש. יש להתחבר שוב.</div> : null}
         <LoginForm />
         <p className="text-center text-xs text-slate-400">
           סביבת דמה. משתמשים: admin, director, duty1, duty2, duty3 · סיסמה: demo1234

@@ -1,13 +1,12 @@
 // מבנה הנתונים של מערכת הבקרה למנהל תורן.
-// כרגע SQLite מקומי. למעבר ל-Supabase (Postgres) משנים provider ל-"postgresql"
-// ואת DATABASE_URL למחרוזת החיבור של Supabase.
+// בסיס נתונים: PostgreSQL (מקומי, Render, Supabase או Neon).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

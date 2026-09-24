@@ -2,6 +2,7 @@ import AppShell from "@/components/AppShell";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import UserForm from "./UserForm";
+import ResetDemo from "./ResetDemo";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function UsersPage() {
             <UserForm user={{ id: u.id, username: u.username, fullName: u.fullName, role: u.role, active: u.active }} />
           </div>
         ))}
+        <ResetDemo />
       </div>
     </AppShell>
   );
