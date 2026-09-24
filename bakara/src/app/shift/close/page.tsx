@@ -6,6 +6,7 @@ import { shiftLabel } from "@/lib/checks";
 import { shiftCloseIssues } from "@/lib/engine";
 import { getMyOpenShift } from "@/lib/shift";
 import { closeShiftAction } from "@/app/actions/shift";
+import QuickAddress from "./QuickAddress";
 
 export const dynamic = "force-dynamic";
 
@@ -41,17 +42,17 @@ export default async function CloseShiftPage({ searchParams }: { searchParams: P
             </IssueBlock>
             <IssueBlock title="חריגות פתוחות שלא קיבלו התייחסות במשמרת הזו" count={issues.unaddressed.length}>
               {issues.unaddressed.map((e) => (
-                <Row key={e.id} href={`/exceptions/${e.id}`} title={e.name} sub={e.item} />
+                <QuickAddress key={e.id} id={e.id} title={e.name} sub={e.item} />
               ))}
             </IssueBlock>
             <IssueBlock title="חריגות במעקב שהגיע זמן הבדיקה החוזרת שלהן" count={issues.recheckDue.length}>
               {issues.recheckDue.map((e) => (
-                <Row key={e.id} href={`/exceptions/${e.id}`} title={e.name} sub={e.item} />
+                <QuickAddress key={e.id} id={e.id} title={e.name} sub={e.item} />
               ))}
             </IssueBlock>
             <IssueBlock title="אירועים חריגים מהמשמרת שלא נסגרו ולא הועברו למעקב" count={issues.openIncidents.length}>
               {issues.openIncidents.map((e) => (
-                <Row key={e.id} href={`/exceptions/${e.id}`} title={e.name} sub="אירוע חריג" />
+                <QuickAddress key={e.id} id={e.id} title={e.name} sub="אירוע חריג מהמשמרת" closeOnly />
               ))}
             </IssueBlock>
           </>

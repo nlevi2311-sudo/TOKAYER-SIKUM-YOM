@@ -34,21 +34,25 @@ export default function AppShell({
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <IdleLogout minutes={IDLE_MINUTES} />
-      <header className="no-print sticky top-0 z-20 bg-brand text-white shadow">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+      <header className="no-print sticky top-0 z-20 border-b-4 border-brand bg-white shadow-sm">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2">
           {back ? (
-            <Link href={back} className="rounded-lg px-2 py-1 text-2xl leading-none hover:bg-white/10" aria-label="חזרה">
+            <Link href={back} className="rounded-lg px-2 py-1 text-2xl leading-none text-brand hover:bg-slate-100" aria-label="חזרה">
               →
             </Link>
           ) : null}
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-bold">{title ?? "מערכת בקרה למנהל תורן"}</div>
-            <div className="truncate text-xs text-blue-100">
+          <Link href="/" className="shrink-0" aria-label="דף הבית">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-tokayer.png" alt="טוקאייר" className="h-8 w-auto sm:h-9" />
+          </Link>
+          <div className="min-w-0 flex-1 border-r border-slate-200 pr-3">
+            <div className="truncate text-base font-bold text-slate-900">{title ?? "בקרת מנהל תורן"}</div>
+            <Link href="/account" className="block truncate text-xs text-slate-500 hover:underline">
               {user.fullName} · {ROLE_LABELS[user.role]}
-            </div>
+            </Link>
           </div>
           <TopNav items={items} />
-          <a href="/logout" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-white/10">
+          <a href="/logout" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">
             יציאה
           </a>
         </div>

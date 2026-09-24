@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { can, requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
-import { ITEM_BY_KEY, SHIFT_TYPES, CheckStatus, Independence } from "@/lib/checks";
+import { ITEM_BY_KEY, SHIFT_TYPES, CheckStatus, Independence, itemsFor, shiftCheckpoints } from "@/lib/checks";
 import { nowIL, parseLocalDateTime } from "@/lib/time";
 import { shiftCloseIssues } from "@/lib/engine";
 import { buildShiftSummary } from "@/lib/summary";
@@ -48,7 +48,6 @@ function validateException(ex: ExceptionInput | null | undefined): string | null
   if (!ex) return "חובה לתעד את החריגה";
   const required: [keyof ExceptionInput, string][] = [
     ["whatHappened", "מה קרה"],
-    ["reason", "מה הסיבה"],
     ["actionsTaken", "מה נעשה עד עכשיו"],
     ["handler", "מי מטפל"],
   ];
@@ -69,12 +68,11 @@ export async function saveCheckAction(input: SaveCheckInput): Promise<{ error?: 
   const child = await db.child.findUnique({ where: { id: input.childId } });
   if (!child || !child.active) return { error: "ילד לא נמצא" };
 
+  // מדד העצמאות לא חובה: "בוצע" נשמר בלחיצה אחת, ואפשר להוסיף איך בוצע אחר כך
   let independence: string | null = null;
   if (item.independence) {
-    if (input.status === "DONE") {
-      if (!input.independence || input.independence === "NONE") return { error: "יש לסמן איך בוצע: עצמאית, אחרי תזכורת או אחרי ליווי" };
-      independence = input.independence;
-    } else if (input.status === "NOT_DONE") independence = "NONE";
+    if (input.status === "DONE" && input.independence && input.independence !== "NONE") independence = input.independence;
+    else if (input.status === "NOT_DONE") independence = "NONE";
   }
 
   const date = shift.date;
@@ -115,7 +113,7 @@ export async function saveCheckAction(input: SaveCheckInput): Promise<{ error?: 
         shiftId: shift.id,
         openedById: user.id,
         whatHappened: ex.whatHappened.trim(),
-        reason: ex.reason.trim(),
+        reason: ex.reason.trim() || "לא צוין",
         actionsTaken: ex.actionsTaken.trim(),
         handler: ex.handler.trim(),
         needsFollowup: ex.needsFollowup,
@@ -178,4 +176,25 @@ export async function closeShiftAction(formData: FormData) {
   await audit(user.id, "SHIFT_CLOSE", "Shift", shift.id, { type: shift.type });
   revalidatePath("/", "layout");
   redirect(`/shifts/${shift.id}?closed=1`);
+}
+
+/** "הכל תקין": מסמן בוצע בכל התחומים של המשמרת שעדיין לא סומנו. לא משנה סימונים קיימים. */
+export async function bulkDoneAction(childId: string): Promise<{ error?: string; count?: number }> {
+  const user = await requireUser(["DUTY", "ADMIN"]);
+  const shift = await getMyOpenShift(user.id);
+  if (!shift) return { error: "אין משמרת פתוחה" };
+  const child = await db.child.findUnique({ where: { id: childId } });
+  if (!child || !child.active) return { error: "ילד לא נמצא" };
+  const existing = await db.checkEntry.findMany({ where: { date: shift.date, childId } });
+  const done = new Set(existing.map((e) => e.itemKey));
+  const missing = itemsFor(child, shiftCheckpoints(shift.type)).filter((i) => !done.has(i.key));
+  if (!missing.length) return { count: 0 };
+  await db.checkEntry.createMany({
+    data: missing.map((i) => ({ date: shift.date, childId, itemKey: i.key, status: "DONE", shiftId: shift.id, updatedById: user.id })),
+    skipDuplicates: true,
+  });
+  await audit(user.id, "CHECK_BULK", "Child", childId, { child: child.fullName, items: missing.map((i) => i.label) });
+  revalidatePath("/shift");
+  revalidatePath(`/shift/child/${childId}`);
+  return { count: missing.length };
 }

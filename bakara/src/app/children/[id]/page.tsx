@@ -4,7 +4,7 @@ import AppShell from "@/components/AppShell";
 import { Empty, ExceptionStatusBadge } from "@/components/ui";
 import { can, requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { CHECK_ITEMS, itemApplies, itemLabel } from "@/lib/checks";
+import { CHECK_ITEMS, itemApplies, itemLabel, ageText } from "@/lib/checks";
 import { independencePct, itemStats, weeklyTrend } from "@/lib/stats";
 import { addDays, daysBetween, fmtDate, fmtDateTime, nowIL } from "@/lib/time";
 
@@ -46,7 +46,7 @@ export default async function ChildHistoryPage({ params, searchParams }: { param
           <div>
             <div className="text-xl font-bold">{child.fullName}</div>
             <div className="text-sm text-slate-600">
-              {child.unit.name} · גיל {child.age} · שינה {child.bedtime} · {child.present ? "בפנימייה" : "לא בפנימייה"}
+              {[child.unit.name, ageText(child.age), `שינה ${child.bedtime}`, child.present ? "בפנימייה" : "לא בפנימייה"].filter(Boolean).join(" · ")}
               {child.hasMedication ? " · 💊 טיפול תרופתי" : ""}
             </div>
             {child.importantNotes ? <div className="mt-1 text-sm">📌 {child.importantNotes}</div> : null}

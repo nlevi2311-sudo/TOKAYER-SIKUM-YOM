@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { ColorDot, COLOR_STYLES } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
-import { CHECKPOINTS, dueLabel, dueMinutes, itemApplies, CHECK_ITEMS, shiftCheckpoints, itemLabel } from "@/lib/checks";
+import { CHECKPOINTS, dueLabel, dueMinutes, itemApplies, CHECK_ITEMS, shiftCheckpoints, itemLabel, ageText } from "@/lib/checks";
 import { childStatus, loadDay } from "@/lib/engine";
 import { getMyOpenShift } from "@/lib/shift";
 import { fmtTime, nowIL } from "@/lib/time";
@@ -68,7 +68,7 @@ export default async function ChildCheckPage({ params }: { params: Promise<{ id:
           <div className="min-w-0 flex-1">
             <div className="text-xl font-bold">{child.fullName}</div>
             <div className="text-sm text-slate-600">
-              {child.unit.name} · גיל {child.age} · שינה {child.bedtime}
+              {[child.unit.name, ageText(child.age), `שינה ${child.bedtime}`].filter(Boolean).join(" · ")}
               {child.hasMedication ? " · 💊 טיפול תרופתי" : ""}
             </div>
           </div>

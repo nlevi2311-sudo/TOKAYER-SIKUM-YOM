@@ -135,3 +135,7 @@ export function dueLabel(item: CheckItem, child: ChildLike): string {
   const min = dueMinutes(item, child);
   return `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 }
+
+export function ageText(age: number): string {
+  return age > 0 ? `גיל ${age}` : "";
+}

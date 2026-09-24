@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { clearCheckAction, saveCheckAction, type ExceptionInput } from "@/app/actions/shift";
+import { bulkDoneAction, clearCheckAction, saveCheckAction, type ExceptionInput } from "@/app/actions/shift";
 import type { CheckStatus, Independence } from "@/lib/checks";
 
 export type ItemView = {
@@ -64,7 +64,6 @@ export default function ChildChecks({
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [indFor, setIndFor] = useState<string | null>(null);
   const [exFor, setExFor] = useState<{ key: string; status: CheckStatus } | null>(null);
   const [ex, setEx] = useState<ExceptionInput>(emptyEx());
   const [error, setError] = useState<{ key: string; msg: string } | null>(null);
@@ -78,7 +77,6 @@ export default function ChildChecks({
         setError({ key, msg: res.error });
         return;
       }
-      setIndFor(null);
       setExFor(null);
       setEx(emptyEx());
       router.refresh();
@@ -87,13 +85,7 @@ export default function ChildChecks({
 
   function onStatus(item: ItemView, status: CheckStatus) {
     setError(null);
-    if (status === "DONE" && item.independence) {
-      setExFor(null);
-      setIndFor(item.key);
-      return;
-    }
     if ((status === "NOT_DONE" || status === "NEEDS_CARE") && !(item.exception && item.exception.status !== "CLOSED")) {
-      setIndFor(null);
       setExFor({ key: item.key, status });
       setEx(emptyEx());
       return;
@@ -146,22 +138,20 @@ export default function ChildChecks({
           ))}
         </div>
 
-        {indFor === item.key ? (
-          <div className="mt-2 rounded-xl bg-ok-bg p-2">
-            <div className="mb-1 text-sm font-semibold text-ok">איך בוצע?</div>
-            <div className="grid grid-cols-3 gap-1.5">
-              {IND_BTNS.map((b) => (
-                <button
-                  key={b.key}
-                  type="button"
-                  disabled={pending}
-                  onClick={() => save(item.key, "DONE", b.key)}
-                  className="min-h-12 rounded-xl bg-white text-sm font-bold text-ok ring-1 ring-green-300 active:scale-95"
-                >
-                  {b.label}
-                </button>
-              ))}
-            </div>
+        {current === "DONE" && item.independence ? (
+          <div className="mt-2 flex items-center gap-1.5">
+            <span className="text-xs text-slate-500">איך?</span>
+            {IND_BTNS.map((b) => (
+              <button
+                key={b.key}
+                type="button"
+                disabled={pending}
+                onClick={() => save(item.key, "DONE", item.entry?.independence === b.key ? undefined : b.key)}
+                className={`min-h-9 flex-1 rounded-lg text-xs font-bold ring-1 active:scale-95 ${item.entry?.independence === b.key ? "bg-ok text-white ring-ok" : "bg-white text-ok ring-green-200"}`}
+              >
+                {b.label}
+              </button>
+            ))}
           </div>
         ) : null}
 
@@ -181,7 +171,7 @@ export default function ChildChecks({
           >
             <div className="font-bold text-bad">תיעוד חריגה: חובה לפני שמירה</div>
             <Field label="מה קרה" value={ex.whatHappened} onChange={(v) => setEx({ ...ex, whatHappened: v })} textarea />
-            <Field label="מה הסיבה" value={ex.reason} onChange={(v) => setEx({ ...ex, reason: v })} />
+            <Field label="מה הסיבה (לא חובה)" value={ex.reason} onChange={(v) => setEx({ ...ex, reason: v })} required={false} />
             <Field label="מה נעשה עד עכשיו" value={ex.actionsTaken} onChange={(v) => setEx({ ...ex, actionsTaken: v })} textarea />
             <div>
               <label className="label">מי מטפל</label>
@@ -230,8 +220,27 @@ export default function ChildChecks({
 
   const shiftCps = checkpoints.filter((c) => c.inShift);
   const otherCps = checkpoints.filter((c) => !c.inShift);
+  const missingInShift = items.filter((i) => i.inShift && !i.entry).length;
   return (
     <div className="space-y-4">
+      {missingInShift > 0 ? (
+        <button
+          type="button"
+          disabled={pending}
+          className="btn-ok w-full text-lg"
+          onClick={() => {
+            if (!confirm(`לסמן "בוצע" ב-${missingInShift} התחומים שעוד לא סומנו? מה שכבר סומן לא ישתנה.`)) return;
+            start(async () => {
+              const res = await bulkDoneAction(childId);
+              if (res.error) setError({ key: "_bulk", msg: res.error });
+              router.refresh();
+            });
+          }}
+        >
+          ✓ הכל תקין ({missingInShift})
+        </button>
+      ) : null}
+      {error?.key === "_bulk" ? <div className="rounded-lg bg-bad-bg p-2 text-sm font-bold text-bad">{error.msg}</div> : null}
       {shiftCps.map((cp) => (
         <section key={cp.key}>
           <h2 className="h2 mb-2">{cp.label}</h2>
@@ -285,7 +294,7 @@ function Field({
 function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-white px-3 ring-1 ring-slate-200">
-      <input type="checkbox" className="h-5 w-5 accent-blue-800" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input type="checkbox" className="h-5 w-5 accent-cyan-800" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <span className="font-semibold">{label}</span>
     </label>
   );

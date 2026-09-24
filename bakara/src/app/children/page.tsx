@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ageText } from "@/lib/checks";
 import AppShell from "@/components/AppShell";
 import { requireUser, can } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -23,6 +24,11 @@ export default async function ChildrenPage({ searchParams }: { searchParams: Pro
               + הוספת ילד
             </Link>
           ) : null}
+          {can.manageChildren(user) ? (
+            <Link href="/admin/import" className="btn-secondary">
+              ייבוא מאקסל
+            </Link>
+          ) : null}
           <Link href={all ? "/children" : "/children?all=1"} className="btn-secondary">
             {all ? "רק פעילים" : "כולל לא פעילים"}
           </Link>
@@ -41,7 +47,7 @@ export default async function ChildrenPage({ searchParams }: { searchParams: Pro
                     <Link href={`/children/${c.id}`} className="min-w-0 flex-1">
                       <div className={`font-bold ${c.active ? "" : "text-slate-400 line-through"}`}>{c.fullName}</div>
                       <div className="text-sm text-slate-600">
-                        גיל {c.age} · שינה {c.bedtime}
+                        {[ageText(c.age), `שינה ${c.bedtime}`].filter(Boolean).join(" · ")}
                         {c.hasMedication ? " · 💊" : ""}
                         {c._count.exceptions ? <span className="font-bold text-bad"> · {c._count.exceptions} חריגות פעילות</span> : null}
                       </div>

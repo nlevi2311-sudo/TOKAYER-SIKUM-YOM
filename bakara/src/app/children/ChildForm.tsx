@@ -28,8 +28,8 @@ export default function ChildForm({ child, units }: { child?: Child; units: Unit
           </select>
         </div>
         <div>
-          <label className="label">גיל</label>
-          <input name="age" type="number" min={3} max={25} className="input" defaultValue={child?.age} required />
+          <label className="label">גיל (לא חובה)</label>
+          <input name="age" type="number" min={0} max={25} className="input" defaultValue={child?.age || ""} />
         </div>
       </div>
       <div>
@@ -71,7 +71,7 @@ export default function ChildForm({ child, units }: { child?: Child; units: Unit
 function Toggle({ name, label, defaultChecked }: { name: string; label: string; defaultChecked: boolean }) {
   return (
     <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl bg-slate-50 px-3 ring-1 ring-slate-200">
-      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-5 w-5 accent-blue-800" />
+      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-5 w-5 accent-cyan-800" />
       <span className="font-semibold">{label}</span>
     </label>
   );

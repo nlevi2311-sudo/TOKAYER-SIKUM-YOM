@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
+import { DEMO_PASSWORD } from "@/lib/settings";
 
 type Result = { error?: string; ok?: string } | null;
 const ROLES = ["ADMIN", "DIRECTOR", "DUTY"];
@@ -21,13 +22,14 @@ export async function saveUserAction(_prev: Result, formData: FormData): Promise
   if (!fullName) return { error: "חסר שם" };
   if (!ROLES.includes(role)) return { error: "תפקיד לא תקין" };
   if (password && password.length < 8) return { error: "סיסמה צריכה להיות באורך 8 תווים לפחות" };
+  if (password === DEMO_PASSWORD) return { error: "אי אפשר להשתמש בסיסמת הדמה" };
   if (id) {
     if (id === admin.id && (!active || role !== "ADMIN")) return { error: "אי אפשר להוריד לעצמך הרשאת מנהל מערכת" };
     await db.user.update({
       where: { id },
       data: { fullName, role, active, ...(password ? { passwordHash: await bcrypt.hash(password, 10) } : {}) },
     });
-    if (!active || password) await db.session.deleteMany({ where: { userId: id } });
+    if (id !== admin.id && (!active || password)) await db.session.deleteMany({ where: { userId: id } });
     await audit(admin.id, "USER_UPDATE", "User", id, { fullName, role, active, passwordChanged: !!password });
     revalidatePath("/admin/users");
     return { ok: "נשמר" };

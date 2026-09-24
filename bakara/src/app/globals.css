@@ -10,7 +10,8 @@
   --color-bad-bg: #fee2e2;
   --color-idle: #6b7280;
   --color-idle-bg: #f3f4f6;
-  --color-brand: #1e40af;
+  --color-brand: #1c6c84;
+  --color-brand-dark: #14505f;
 }
 
 html,
@@ -33,7 +34,7 @@ body {
 }
 
 @utility btn-primary {
-    @apply btn bg-brand text-white hover:bg-blue-900;
+    @apply btn bg-brand text-white hover:bg-brand-dark;
 }
 
 @utility btn-secondary {
@@ -49,7 +50,7 @@ body {
 }
 
 @utility input {
-    @apply block w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-blue-200;
+    @apply block w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-cyan-100;
 }
 
 @utility label {

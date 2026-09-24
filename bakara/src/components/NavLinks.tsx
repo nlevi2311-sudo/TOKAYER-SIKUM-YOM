@@ -15,7 +15,7 @@ export function TopNav({ items }: { items: NavItem[] }) {
           <Link
             key={i.href}
             href={i.href}
-            className={`rounded-lg px-3 py-2 text-sm font-semibold ${active ? "bg-white/20" : "hover:bg-white/10"}`}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold ${active ? "bg-brand text-white" : "text-slate-700 hover:bg-slate-100"}`}
           >
             {i.label}
           </Link>

@@ -51,7 +51,7 @@ model Child {
   fullName        String
   unitId          String
   unit            Unit     @relation(fields: [unitId], references: [id])
-  age             Int
+  age             Int      @default(0) // 0 = לא ידוע
   present         Boolean  @default(true)
   importantNotes  String   @default("")
   hasMedication   Boolean  @default(false)
@@ -166,4 +166,10 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// הגדרות מערכת. mode: demo = נתוני דמה, real = נתונים אמיתיים (טעינת דמה חסומה)
+model Setting {
+  key   String @id
+  value String
 }

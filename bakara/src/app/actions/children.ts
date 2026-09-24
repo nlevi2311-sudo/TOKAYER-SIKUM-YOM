@@ -15,7 +15,7 @@ export async function saveChildAction(_prev: Result, formData: FormData): Promis
   const data = {
     fullName: get("fullName"),
     unitId: get("unitId"),
-    age: Number(get("age")),
+    age: Number(get("age") || 0),
     present: formData.get("present") === "on",
     importantNotes: get("importantNotes"),
     hasMedication: formData.get("hasMedication") === "on",
@@ -27,7 +27,7 @@ export async function saveChildAction(_prev: Result, formData: FormData): Promis
   };
   if (!data.fullName) return { error: "חסר שם" };
   if (!data.unitId) return { error: "יש לבחור ביתן" };
-  if (!Number.isInteger(data.age) || data.age < 3 || data.age > 25) return { error: "גיל לא תקין" };
+  if (!Number.isInteger(data.age) || data.age < 0 || data.age > 25) return { error: "גיל לא תקין" };
   if (!/^\d{2}:\d{2}$/.test(data.bedtime)) return { error: "שעת שינה לא תקינה" };
   if (id) {
     const before = await db.child.findUnique({ where: { id } });
