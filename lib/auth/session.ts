@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { isDemoMode, isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { DEMO_USER } from "@/lib/demo/user";
@@ -17,6 +18,8 @@ function firstNameOf(fullName: string, email: string): string {
  * מחזיר null אם אין משתמש מחובר. נשמר ב-cache לכל בקשה.
  */
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
+  // בדיקת הרשאה תמיד בזמן הבקשה. אסור שעמוד מוגן ייבנה מראש כעמוד סטטי
+  await connection();
   if (isDemoMode()) return DEMO_USER;
   if (!isSupabaseConfigured()) return null;
 
@@ -52,6 +55,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
 
 /** לשימוש ב-layouts ובעמודים של אזור הצוות */
 export async function requireStaff(nextPath = "/staff"): Promise<SessionUser> {
+  await connection();
   if (!isSupabaseConfigured() && !isDemoMode()) redirect("/setup");
   const user = await getSessionUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
