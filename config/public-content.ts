@@ -17,7 +17,7 @@ const optionalUrl = z
   .string()
   .trim()
   .max(1000)
-  .refine((v) => v === "" || /^(https?:\/\/|\/)/i.test(v), "כתובת צריכה להתחיל ב-https:// או ב-/");
+  .refine((v) => v === "" || /^(https?:\/\/|\/)/i.test(v), "כתובת צריכה להתחיל ב https:// או ב /");
 
 export const cardItemSchema = z.object({
   title: text(120).min(1, "חובה"),
@@ -439,7 +439,7 @@ export const contentSections: ContentSection[] = [
       { name: "address", label: "כתובת", type: "text" },
       { name: "hours", label: "שעות מענה", type: "text" },
       { name: "whatsapp", label: "WhatsApp", type: "text", help: "פורמט בינלאומי בלי + ובלי מקפים, למשל 972501234567" },
-      { name: "mapsUrl", label: "קישור ל-Google Maps", type: "url" },
+      { name: "mapsUrl", label: "קישור ל Google Maps", type: "url" },
       { name: "mapsEmbedUrl", label: "קישור הטמעה של המפה", type: "url", help: "Google Maps > שיתוף > הטמעת מפה > הכתובת שבתוך src" },
     ],
   },

@@ -143,7 +143,7 @@ type ResSeed = {
   keywords?: string[];
 };
 
-const PROCEDURE_NOTE = "הקישור יעודכן לנוהל המלא בתיקיית הנהלים ב-Google Drive.";
+const PROCEDURE_NOTE = "הקישור יעודכן לנוהל המלא בתיקיית הנהלים ב Google Drive.";
 
 const resourceSeeds: ResSeed[] = [
   // מערכות + גישה מהירה
@@ -751,7 +751,7 @@ export const seedEmergency: EmergencyProtocolRow[] = emergencySeeds.map((e, i) =
 const onboardingSeeds: Array<Partial<OnboardingItemRow> & Pick<OnboardingItemRow, "stage" | "title">> = [
   { stage: "day1", title: "פגישת היכרות עם הממונה הישיר", description: "תיאום ציפיות, שעות, ומי מלווה אותך בשבועות הראשונים." },
   { stage: "day1", title: "סיור בכפר", description: "הבתים, חדר הצוות, המרפאה, המטבח ויציאות החירום." },
-  { stage: "day1", title: "קבלת הרשאות למערכות", description: "חשבון Google ארגוני, תלם ו-EasyShift." },
+  { stage: "day1", title: "קבלת הרשאות למערכות", description: "חשבון Google ארגוני, תלם ו EasyShift." },
   { stage: "week1", title: "הדרכת עובד חדש", description: "חובה בשבוע הראשון.", training_id: training("הדרכת עובד חדש") },
   { stage: "week1", title: "משמרות חפיפה", description: "עבודה לצד איש צוות ותיק לפני משמרת עצמאית." },
   { stage: "week1", title: "קריאת נהלי החובה", description: "רשימת הנהלים מופיעה למטה בעמוד." },

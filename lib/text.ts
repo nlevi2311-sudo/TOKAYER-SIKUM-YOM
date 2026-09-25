@@ -88,3 +88,18 @@ export function formatRelative(value: string | Date): string {
   if (days < 7) return `לפני ${days} ימים`;
   return formatDate(date);
 }
+
+export function isWithinDays(value: string | Date, days: number): boolean {
+  const date = typeof value === "string" ? new Date(value) : value;
+  return Date.now() - date.getTime() < days * 24 * 60 * 60 * 1000;
+}
+
+/** ראשי תיבות לאווטאר: "נוי רפאל לוי" -> "נר" */
+export function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("");
+}

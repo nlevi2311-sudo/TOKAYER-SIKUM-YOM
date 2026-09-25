@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import type { LucideProps } from "lucide-react";
 import { getIcon, type IconName } from "@/lib/icons";
 
@@ -7,6 +8,5 @@ export function DynamicIcon({
   fallback,
   ...props
 }: { name: string | null | undefined; fallback?: IconName } & Omit<LucideProps, "name">) {
-  const Icon = getIcon(name, fallback);
-  return <Icon aria-hidden="true" {...props} />;
+  return createElement(getIcon(name, fallback), { "aria-hidden": true, ...props });
 }

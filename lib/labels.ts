@@ -119,7 +119,7 @@ export const DOC_TYPE_LABELS: Record<DocType, string> = {
   google_sheet: "גיליון Google",
   google_form: "טופס Google",
   google_slides: "מצגת Google",
-  google_folder: "תיקייה ב-Drive",
+  google_folder: "תיקייה ב Drive",
   pdf: "PDF",
   video: "סרטון",
   web: "אתר / מערכת",
