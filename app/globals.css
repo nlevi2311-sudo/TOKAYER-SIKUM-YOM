@@ -1,0 +1,160 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * משתני הצבע עצמם מוגדרים ב-config/theme.ts ומוזרקים ב-app/layout.tsx.
+ * כאן רק ממפים אותם לשמות ש-Tailwind ו-shadcn/ui מכירים.
+ */
+:root {
+  --background: var(--brand-background, #ffffff);
+  --foreground: var(--brand-foreground, #16333b);
+  --card: var(--brand-card, #ffffff);
+  --card-foreground: var(--brand-foreground, #16333b);
+  --popover: var(--brand-card, #ffffff);
+  --popover-foreground: var(--brand-foreground, #16333b);
+  --primary: var(--brand-primary, #127187);
+  --primary-foreground: var(--brand-primary-foreground, #ffffff);
+  --secondary: var(--brand-muted, #eef4f4);
+  --secondary-foreground: var(--brand-foreground, #16333b);
+  --muted: var(--brand-muted, #eef4f4);
+  --muted-foreground: var(--brand-muted-foreground, #636366);
+  --accent: var(--brand-primary-soft, #e6f2f4);
+  --accent-foreground: var(--brand-primary, #127187);
+  --destructive: var(--brand-destructive, #c0392b);
+  --border: var(--brand-border, #dde9ea);
+  --input: var(--brand-border, #dde9ea);
+  --ring: var(--brand-primary, #127187);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* צבעי מותג ישירים */
+  --color-brand: var(--brand-primary);
+  --color-brand-soft: var(--brand-primary-soft);
+  --color-teal-print: var(--brand-teal-print);
+  --color-aqua: var(--brand-aqua);
+  --color-mint: var(--brand-mint);
+  --color-lime: var(--brand-lime);
+  --color-highlight: var(--brand-highlight);
+  --color-surface: var(--brand-surface);
+  --color-warm: var(--brand-accent);
+  --color-warm-foreground: var(--brand-accent-foreground);
+  --color-warm-soft: var(--brand-accent-soft);
+  --color-emergency: var(--brand-emergency);
+  --color-emergency-soft: var(--brand-emergency-soft);
+  --color-success: var(--brand-success);
+  --color-warning: var(--brand-warning);
+
+  /* הפונט הרשמי הוא Fb Coherenti Sans (רישיון בתשלום). עד שיוטען, Heebo משמש כחלופה קרובה. ראו README */
+  --font-sans: "Fb Coherenti Sans", var(--font-heebo), "Heebo", system-ui, sans-serif;
+  --font-display: "Fb Coherenti Sans", var(--font-heebo), "Heebo", system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 6px);
+  --radius-lg: calc(var(--radius) - 4px);
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 4px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --animate-fade-up: fade-up 0.5s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  /* כותרת עליונה קטנה בכתום, כמו בספר המותג */
+  .eyebrow {
+    @apply text-sm font-bold text-warm;
+  }
+  /* רקע טורקיז מדורג, לאזורי Hero ומסכי פתיחה */
+  .bg-brand-gradient {
+    background: linear-gradient(160deg, var(--brand-primary) 0%, var(--brand-teal-print) 55%, var(--brand-mint) 100%);
+  }
+  .bg-brand-soft {
+    background: linear-gradient(180deg, var(--brand-surface) 0%, #ffffff 100%);
+  }
+  .card-lift {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
