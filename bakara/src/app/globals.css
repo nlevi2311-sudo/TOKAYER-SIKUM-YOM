@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Segoe UI", "Rubik", "Heebo", Arial, "Noto Sans Hebrew", sans-serif;
+  --color-ok: #15803d;
+  --color-ok-bg: #dcfce7;
+  --color-warn: #c2410c;
+  --color-warn-bg: #ffedd5;
+  --color-bad: #b91c1c;
+  --color-bad-bg: #fee2e2;
+  --color-idle: #6b7280;
+  --color-idle-bg: #f3f4f6;
+  --color-brand: #1c6c84;
+  --color-brand-dark: #14505f;
+}
+
+html,
+body {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@utility card {
+    @apply rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200;
+}
+
+@utility btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition active:scale-[0.98] disabled:opacity-50;
+}
+
+@utility btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand-dark;
+}
+
+@utility btn-secondary {
+    @apply btn bg-white text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50;
+}
+
+@utility btn-danger {
+    @apply btn bg-bad text-white hover:bg-red-800;
+}
+
+@utility btn-ok {
+    @apply btn bg-ok text-white hover:bg-green-800;
+}
+
+@utility input {
+    @apply block w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-cyan-100;
+}
+
+@utility label {
+    @apply mb-1 block text-sm font-semibold text-slate-700;
+}
+
+@utility h1 {
+    @apply text-2xl font-bold;
+}
+
+@utility h2 {
+    @apply text-lg font-bold;
+}
+
+@utility muted {
+    @apply text-sm text-slate-500;
+}
+
+@utility table {
+    @apply w-full text-sm;
+}
+
+@layer components {
+  .table th {
+    @apply border-b border-slate-200 bg-slate-50 px-2 py-2 text-right font-semibold text-slate-600;
+  }
+  .table td {
+    @apply border-b border-slate-100 px-2 py-2 align-top;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  .card {
+    box-shadow: none;
+  }
+}
