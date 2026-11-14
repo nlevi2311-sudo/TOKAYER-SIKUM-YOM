@@ -183,6 +183,15 @@ export type LomdaProgressRow = {
   completed_at: string | null;
 } & Timestamps;
 
+export type AiDocumentRow = {
+  id: string;
+  title: string;
+  content: string;
+  source_name: string | null;
+  active: boolean;
+  created_by: string | null;
+} & Timestamps;
+
 export type RecentItemRow = {
   id: string;
   user_id: string;
@@ -233,6 +242,7 @@ export type Database = {
       recent_items: Table<RecentItemRow, "user_id">;
       public_content: Table<PublicContentRow, "key">;
       lomda_progress: Table<LomdaProgressRow, "user_id">;
+      ai_documents: Table<AiDocumentRow, "title" | "content">;
     };
     Views: { [_ in never]: never };
     Functions: {

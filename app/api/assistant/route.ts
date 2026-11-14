@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth/session";
-import { KNOWLEDGE, SYSTEM_PROMPT } from "@/lib/ai/knowledge";
+import { KNOWLEDGE, SYSTEM_PROMPT, getDynamicKnowledge } from "@/lib/ai/knowledge";
 
 /**
  * העוזר של טוקאייר: עונה לשאלות הצוות על סמך האוגדן והלומדה.
@@ -37,15 +37,22 @@ export async function POST(request: Request) {
     return Response.json({ error: "העוזר עדיין לא מחובר לשירות ה-AI." }, { status: 503 });
   }
 
+  const dynamic = await getDynamicKnowledge().catch((e) => {
+    console.error("[assistant] dynamic knowledge", e);
+    return "";
+  });
+  const system: Anthropic.TextBlockParam[] = [
+    { type: "text", text: SYSTEM_PROMPT },
+    { type: "text", text: KNOWLEDGE, cache_control: { type: "ephemeral" } },
+  ];
+  if (dynamic) system.push({ type: "text", text: dynamic, cache_control: { type: "ephemeral" } });
+
   const client = new Anthropic();
   const stream = client.messages.stream({
     model: "claude-opus-5-5",
     max_tokens: 4000,
     output_config: { effort: "low" },
-    system: [
-      { type: "text", text: SYSTEM_PROMPT },
-      { type: "text", text: KNOWLEDGE, cache_control: { type: "ephemeral" } },
-    ],
+    system,
     messages,
   });
 

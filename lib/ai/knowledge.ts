@@ -1,4 +1,6 @@
 import "server-only";
+import { isDemoMode } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
 import { BITANS, COMMON_CHECKLIST, OGDAN_GATES, OGDAN_PROCEDURES, TRACKS, getUnits } from "@/lib/content/lomda";
 import type { ContentTable, Unit } from "@/lib/content/lomda-types";
 
@@ -56,13 +58,64 @@ function build(): string {
 
 export const KNOWLEDGE = build();
 
+/**
+ * החלק המשתנה של הידע: המסמכים שההנהלה העלתה למאגר, ומה שמוזן באפליקציה
+ * (קישורים ומערכות, אנשי קשר, כרטיסי חירום, עדכונים). נקרא בשם העובד, כך שה-RLS חל.
+ */
+export async function getDynamicKnowledge(): Promise<string> {
+  if (isDemoMode()) return "";
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const [docs, resources, contacts, emergency, announcements] = await Promise.all([
+    supabase.from("ai_documents").select("title, content").eq("active", true).order("created_at"),
+    supabase.from("resources").select("title, description, url, type, owner").order("sort_order"),
+    supabase.from("contacts").select("full_name, role_title, responsibility, department, phone, email, is_emergency").order("sort_order"),
+    supabase.from("emergency_protocols").select("title, now_steps, call_list, dont_list, report_text").order("sort_order"),
+    supabase.from("announcements").select("title, body, published_at, expires_at").lte("published_at", now).order("published_at", { ascending: false }).limit(30),
+  ]);
+
+  const out: string[] = [];
+  if (docs.data?.length) {
+    out.push("# מסמכים שההנהלה העלתה למאגר הידע");
+    for (const d of docs.data) out.push(`## ${d.title}\n${d.content}`);
+  }
+  if (resources.data?.length) {
+    out.push("# קישורים, מערכות, נהלים וטפסים באפליקציה");
+    for (const r of resources.data) out.push(`- ${r.title}${r.description ? `: ${r.description}` : ""} (${r.type}${r.owner ? `, אחראי: ${r.owner}` : ""}) ${r.url}`);
+  }
+  if (contacts.data?.length) {
+    out.push("# אנשי קשר של הצוות");
+    for (const c of contacts.data) {
+      out.push(`- ${[c.full_name, c.role_title, c.responsibility, c.department, c.phone, c.email, c.is_emergency ? "חירום" : null].filter(Boolean).join(" | ")}`);
+    }
+  }
+  if (emergency.data?.length) {
+    out.push("# כרטיסי חירום");
+    for (const e of emergency.data) {
+      out.push(`## ${e.title}`);
+      out.push(...e.now_steps.map((x, i) => `${i + 1}. ${x}`));
+      if (e.call_list.length) out.push(`למי מתקשרים: ${e.call_list.map((c) => `${c.label} ${c.phone}`).join("; ")}`);
+      if (e.dont_list.length) out.push(`לא עושים: ${e.dont_list.join("; ")}`);
+      if (e.report_text) out.push(`דיווח: ${e.report_text}`);
+    }
+  }
+  const live = announcements.data?.filter((a) => !a.expires_at || a.expires_at > now) ?? [];
+  if (live.length) {
+    out.push("# עדכונים אחרונים לצוות");
+    for (const a of live) out.push(`## ${a.title} (${a.published_at.slice(0, 10)})\n${a.body}`);
+  }
+  return out.join("\n");
+}
+
 export const SYSTEM_PROMPT = `אתה "העוזר של טוקאייר", עוזר לצוות כפר הילדים והנוער טוקאייר: פנימייה טיפולית פוסט אשפוזית לבנים בני 7 עד 18 בקיבוץ בחן, בהפעלת קבוצת גיא.
 המשתמשים הם אנשי צוות: מדריכים, עו״סים, אמהות בית, ש״ש, רכזים ומנהלים. הם שואלים אותך באמצע משמרת מה עושים, מי אחראי ואיך לפעול לפי הנהלים.
 
 איך עונים:
-- עונים רק על סמך החומר שלמטה (האוגדן, הלומדה והביתנים). אם התשובה לא נמצאת בחומר, אומרים את זה במפורש ומפנים למנהל התורן או לגורם האחראי. לא ממציאים נוהל, שעה, מספר או שם.
+- עונים אך ורק על סמך החומר שלמטה: אוגדן הנהלים, הלומדה, הביתנים, המסמכים שההנהלה העלתה ומה שמוזן באפליקציה. לא משתמשים בידע כללי, גם כשהוא נראה נכון, ולא משלימים פרטים מהשכל הישר.
+- אם התשובה לא נמצאת בחומר, כותבים: "אין לי מידע על זה בחומר של טוקאייר", ומפנים למנהל התורן או לגורם האחראי. לא ממציאים נוהל, שעה, מספר, טלפון או שם.
+- אם יש סתירה בין מסמכים, אומרים את זה, מציינים את שני המקורות ומפנים להנהלה להכרעה.
 - מתחילים ישר בתשובה: מה עושים עכשיו, לפי הסדר. אחר כך, אם צריך, מי מחליט ואת מי מעדכנים.
-- מציינים מספר נוהל בצורה "נוהל 37", כדי שהעובד יוכל לפתוח אותו.
+- מציינים את המקור: מספר נוהל בצורה "נוהל 37" (כך הוא הופך לקישור), או שם המסמך מהמאגר.
 - עברית טבעית, ישירה ועניינית, כמו מנהל מנוסה שמדבר עם איש צוות. משפטים קצרים. בלי מקפים, בלי הקדמות ובלי סיכומים מיותרים. רשימה ממוספרת רק כשיש סדר פעולות.
 - במצב חירום או סיכון (פגיעה עצמית, אלימות, בריחה, חשד לפגיעה מינית, מצב רפואי דחוף): השורה הראשונה היא הפעולה המיידית ואת מי מזעיקים. מזכירים שהעוזר לא מחליף את המנהל התורן.
 - תרופות: לעולם לא ממליצים על תרופה או מינון. מפנים לנוהל, לאחות ולמנהל התורן.

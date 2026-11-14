@@ -7,6 +7,7 @@ import {
   Globe,
   GraduationCap,
   LayoutDashboard,
+  BrainCircuit,
   Library,
   ListChecks,
   Megaphone,
@@ -34,6 +35,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { href: "/admin/emergency", label: "מסך חירום", icon: Siren },
       { href: "/admin/onboarding", label: "מסלול קליטה", icon: Route },
       { href: "/admin/lomda", label: "לומדת קליטה", icon: ListChecks },
+      { href: "/admin/knowledge", label: "מאגר הידע של העוזר", icon: BrainCircuit },
     ],
   },
   {
