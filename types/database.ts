@@ -169,6 +169,20 @@ export type FavoriteRow = {
   created_at: string;
 };
 
+export type LomdaProgressRow = {
+  user_id: string;
+  track: "guide" | "sw" | "em" | "shs" | "rk" | "night" | null;
+  bitan: string | null;
+  answers: { first: Record<string, boolean>; right: Record<string, boolean> };
+  checks: Record<string, boolean>;
+  declared: boolean;
+  units_done: number;
+  units_total: number;
+  first_correct: number;
+  questions_total: number;
+  completed_at: string | null;
+} & Timestamps;
+
 export type RecentItemRow = {
   id: string;
   user_id: string;
@@ -218,6 +232,7 @@ export type Database = {
       favorites: Table<FavoriteRow, "user_id">;
       recent_items: Table<RecentItemRow, "user_id">;
       public_content: Table<PublicContentRow, "key">;
+      lomda_progress: Table<LomdaProgressRow, "user_id">;
     };
     Views: { [_ in never]: never };
     Functions: {

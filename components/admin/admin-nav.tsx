@@ -8,6 +8,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Library,
+  ListChecks,
   Megaphone,
   Route,
   Siren,
@@ -32,6 +33,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { href: "/admin/contacts", label: "אנשי קשר", icon: Contact },
       { href: "/admin/emergency", label: "מסך חירום", icon: Siren },
       { href: "/admin/onboarding", label: "מסלול קליטה", icon: Route },
+      { href: "/admin/lomda", label: "לומדת קליטה", icon: ListChecks },
     ],
   },
   {

@@ -9,6 +9,8 @@ export const STAFF_NAV_MAIN: NavItem[] = [
 ];
 
 export const STAFF_NAV_CONTENT: NavItem[] = [
+  { href: "/staff/ogdan", label: "האוגדן", icon: "book" },
+  { href: "/staff/lomda", label: "לומדת קליטה", icon: "list-checks" },
   { href: "/staff/procedures", label: "נהלים", icon: "book-open" },
   { href: "/staff/forms", label: "טפסים", icon: "clipboard-list" },
   { href: "/staff/systems", label: "מערכות", icon: "layout-grid" },
@@ -22,7 +24,7 @@ export const STAFF_NAV_CONTENT: NavItem[] = [
 export const STAFF_BOTTOM_NAV: NavItem[] = [
   { href: "/staff", label: "בית", icon: "house" },
   { href: "/staff/search", label: "חיפוש", icon: "search" },
-  { href: "/staff/library", label: "מסמכים", icon: "folder-open" },
+  { href: "/staff/ogdan", label: "האוגדן", icon: "book" },
   { href: "/staff/systems", label: "מערכות", icon: "layout-grid" },
   { href: "/staff/profile", label: "פרופיל", icon: "user-round" },
 ];
