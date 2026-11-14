@@ -9,6 +9,7 @@ const routes: Array<{ path: string; priority: number; changeFrequency: "weekly" 
   { path: "/fit", priority: 0.8, changeFrequency: "monthly" },
   { path: "/careers", priority: 0.8, changeFrequency: "weekly" },
   { path: "/contact", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/privacy", priority: 0.3, changeFrequency: "monthly" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

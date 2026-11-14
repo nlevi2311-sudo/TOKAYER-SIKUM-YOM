@@ -4,11 +4,14 @@ export type NavItem = { href: string; label: string; icon: IconName };
 
 export const STAFF_NAV_MAIN: NavItem[] = [
   { href: "/staff", label: "בית", icon: "house" },
+  { href: "/staff/assistant", label: "העוזר של טוקאייר", icon: "sparkles" },
   { href: "/staff/updates", label: "עדכונים", icon: "megaphone" },
   { href: "/staff/favorites", label: "המועדפים שלי", icon: "star" },
 ];
 
 export const STAFF_NAV_CONTENT: NavItem[] = [
+  { href: "/staff/ogdan", label: "האוגדן", icon: "book" },
+  { href: "/staff/lomda", label: "לומדת קליטה", icon: "list-checks" },
   { href: "/staff/procedures", label: "נהלים", icon: "book-open" },
   { href: "/staff/forms", label: "טפסים", icon: "clipboard-list" },
   { href: "/staff/systems", label: "מערכות", icon: "layout-grid" },
@@ -21,8 +24,8 @@ export const STAFF_NAV_CONTENT: NavItem[] = [
 /** הניווט התחתון במובייל: חמשת היעדים הנפוצים */
 export const STAFF_BOTTOM_NAV: NavItem[] = [
   { href: "/staff", label: "בית", icon: "house" },
-  { href: "/staff/search", label: "חיפוש", icon: "search" },
-  { href: "/staff/library", label: "מסמכים", icon: "folder-open" },
+  { href: "/staff/assistant", label: "העוזר", icon: "sparkles" },
+  { href: "/staff/ogdan", label: "האוגדן", icon: "book" },
   { href: "/staff/systems", label: "מערכות", icon: "layout-grid" },
   { href: "/staff/profile", label: "פרופיל", icon: "user-round" },
 ];

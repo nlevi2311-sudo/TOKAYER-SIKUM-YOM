@@ -1,0 +1,11 @@
+# פריסה ל Netlify: Next.js עם ה adapter הרשמי (מותקן אוטומטית בבנייה)
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# ה runtime של Next.js. בפריסה דרך העלאה הוא לא נוסף אוטומטית, אז מצהירים עליו כאן
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

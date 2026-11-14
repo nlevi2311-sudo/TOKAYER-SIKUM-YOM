@@ -73,6 +73,20 @@ export default async function OnboardingPage() {
         </div>
       </header>
 
+      <Link
+        href="/staff/lomda"
+        className="flex items-center gap-4 rounded-2xl border-2 border-primary bg-card p-4 transition hover:bg-surface sm:p-5"
+      >
+        <IconBadge name="list-checks" />
+        <span className="flex-1">
+          <span className="block text-lg font-bold text-primary">לומדת קליטה</span>
+          <span className="block text-sm text-muted-foreground">
+            יחידות קצרות לפי תפקיד וביתן, מצבים מהשטח ואישור סיום שנרשם אצל ההנהלה. מתחילים כאן.
+          </span>
+        </span>
+        <ArrowUpLeft className="size-5 shrink-0 text-primary" aria-hidden="true" />
+      </Link>
+
       {items.length === 0 ? (
         <EmptyState icon="sparkles" title="מסלול הקליטה עדיין לא הוגדר" description="ההנהלה מגדירה אותו בממשק הניהול." />
       ) : (
