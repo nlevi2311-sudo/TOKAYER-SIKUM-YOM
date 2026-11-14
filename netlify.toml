@@ -5,3 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# ה runtime של Next.js. בפריסה דרך העלאה הוא לא נוסף אוטומטית, אז מצהירים עליו כאן
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
